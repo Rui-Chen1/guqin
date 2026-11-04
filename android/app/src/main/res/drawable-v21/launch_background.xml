@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 启动画面：宣纸水墨渐变底 + 居中古琴线描 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:centerColor="#F4EDE0"
+                android:endColor="#E6DAC4"
+                android:startColor="#FBF6EC" />
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/ic_splash_guqin"
+        android:gravity="center" />
+</layer-list>

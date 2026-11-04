@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 启动画面中央图形：古琴七弦线描 + 朱砂印点 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="168dp"
+    android:height="168dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+
+    <!-- 朱砂印点 -->
+    <path
+        android:fillColor="#9E3B2F"
+        android:pathData="M120,52 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0" />
+
+    <!-- 七弦：自上而下由细至粗、由淡墨至浓墨 -->
+    <path
+        android:strokeColor="#8A7C6B"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.1"
+        android:pathData="M62,90 L178,90" />
+    <path
+        android:strokeColor="#7D6F5E"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.25"
+        android:pathData="M58,102 L182,102" />
+    <path
+        android:strokeColor="#6B6055"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.4"
+        android:pathData="M54,114 L186,114" />
+    <path
+        android:strokeColor="#5A5047"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.55"
+        android:pathData="M50,126 L190,126" />
+    <path
+        android:strokeColor="#4A4239"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.7"
+        android:pathData="M46,138 L194,138" />
+    <path
+        android:strokeColor="#38312A"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.9"
+        android:pathData="M42,150 L198,150" />
+    <path
+        android:strokeColor="#2B2620"
+        android:strokeLineCap="round"
+        android:strokeWidth="2.1"
+        android:pathData="M38,162 L202,162" />
+</vector>

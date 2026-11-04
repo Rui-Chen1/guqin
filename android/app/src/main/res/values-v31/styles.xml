@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ 系统启动画面（SplashScreen API） -->
+<resources>
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowSplashScreenBackground">#F4EDE0</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_guqin</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#F4EDE0</item>
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+</resources>

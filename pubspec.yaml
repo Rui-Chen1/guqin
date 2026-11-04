@@ -1,0 +1,33 @@
+name: guqin_doc
+description: 弦上知音 —— 古琴艺术智能学习与数字体验平台（移动端 App 原型）
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  # 本地离线存储（单机可用）
+  sqflite: ^2.3.3
+  path: ^1.9.0
+  # 减字谱 SVG 矢量渲染（可缩放、可交互、不模糊）
+  flutter_svg: ^2.0.10+1
+  # 琴曲试听（播放 assets/audio 下的本地音频）
+  audioplayers: ^6.7.1
+  # 智能演奏辅助：麦克风采集（PCM 流 → 本地音高/节奏分析）
+  record: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/audio/
+    - assets/audio/sfx/

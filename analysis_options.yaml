@@ -1,0 +1,12 @@
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - macos/**
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # 原型工程：允许调试打印
+    avoid_print: false
