@@ -192,6 +192,15 @@ class AppDatabase {
     );
   }
 
+  Future<void> writeProgress(String key, int value) async {
+    final db = await database;
+    await db.insert(
+      'progress',
+      {'key': key, 'value': value},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
   Future<Map<String, int>> allProgress() async {
     final db = await database;
     final rows = await db.query('progress');

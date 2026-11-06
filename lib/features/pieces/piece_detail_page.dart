@@ -44,8 +44,9 @@ class _PieceDetailPageState extends State<PieceDetailPage> {
   Widget build(BuildContext context) {
     final p = _piece;
     if (p == null) {
-      return const Scaffold(
-          body: Center(child: CircularProgressIndicator(strokeWidth: 2)));
+      return const InkScaffold(
+        body: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      );
     }
 
     final width = MediaQuery.of(context).size.width;
@@ -99,7 +100,7 @@ class _PieceDetailPageState extends State<PieceDetailPage> {
 
     return DefaultTabController(
       length: 4,
-      child: Scaffold(
+      child: InkScaffold(
         appBar: AppBar(
           title: Text(p.title),
           bottom: const TabBar(

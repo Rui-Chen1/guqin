@@ -52,7 +52,8 @@ class _VisualizePageState extends State<VisualizePage>
     super.initState();
     AppDatabase.instance.bumpProgress('visualize_views');
     _analyzer = LiveAudioAnalyzer(onFrame: _onFrame);
-    _tick = AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    _tick =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1));
   }
 
   @override
@@ -265,7 +266,8 @@ class _VisualizePageState extends State<VisualizePage>
             title: '实时采集',
             trailing: FilledButton.icon(
               onPressed: _busy ? null : (_listening ? _stop : _start),
-              icon: Icon(_listening ? Icons.stop : Icons.mic_none_outlined, size: 16),
+              icon: Icon(_listening ? Icons.stop : Icons.mic_none_outlined,
+                  size: 16),
               label: Text(_listening ? '停止' : '开始采集'),
             ),
           ),
@@ -296,7 +298,9 @@ class _VisualizePageState extends State<VisualizePage>
       builder: (context, _) {
         final f = _frame.value;
         final freq = f?.freq;
-        final midi = freq == null ? null : 69.0 + 12.0 * math.log(freq / 440.0) / math.ln2;
+        final midi = freq == null
+            ? null
+            : 69.0 + 12.0 * math.log(freq / 440.0) / math.ln2;
         final match = _match(f);
         return PaperCard(
           child: Column(
@@ -304,10 +308,15 @@ class _VisualizePageState extends State<VisualizePage>
               Row(
                 children: [
                   _metric('音名', midi == null ? '—' : noteName(midi.round())),
-                  _metric('基频', freq == null ? '—' : '${freq.toStringAsFixed(1)} Hz'),
-                  _metric('电平',
-                      f == null ? '—' : '${(f.rms * 100).clamp(0, 100).toStringAsFixed(0)}%'),
-                  _metric('最接近', match == null ? '—' : kTimbreReferences[match].name),
+                  _metric('基频',
+                      freq == null ? '—' : '${freq.toStringAsFixed(1)} Hz'),
+                  _metric(
+                      '电平',
+                      f == null
+                          ? '—'
+                          : '${(f.rms * 100).clamp(0, 100).toStringAsFixed(0)}%'),
+                  _metric('最接近',
+                      match == null ? '—' : kTimbreReferences[match].name),
                 ],
               ),
               const SizedBox(height: 12),
@@ -335,7 +344,8 @@ class _VisualizePageState extends State<VisualizePage>
                   Icon(Icons.equalizer, size: 16, color: AppColors.gold),
                   SizedBox(width: 6),
                   Text('谐波包络与音色辨识',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                 ],
               ),
               const SizedBox(height: 8),
@@ -371,7 +381,8 @@ class _VisualizePageState extends State<VisualizePage>
               style: const TextStyle(fontSize: 10.5, color: AppColors.inkSoft)),
         );
 
-    Widget cell(String s, {bool right = false, bool strong = false}) => Expanded(
+    Widget cell(String s, {bool right = false, bool strong = false}) =>
+        Expanded(
           child: Text(s,
               textAlign: right ? TextAlign.right : TextAlign.left,
               style: TextStyle(
@@ -409,10 +420,17 @@ class _VisualizePageState extends State<VisualizePage>
         Row(
           children: [
             cell('实时', strong: true),
-            cell(f?.freq == null ? '—' : f!.centroidRatio.toStringAsFixed(2), right: true),
-            cell(f?.freq == null ? '—' : '${(f!.highRatio * 100).toStringAsFixed(1)}%',
+            cell(f?.freq == null ? '—' : f!.centroidRatio.toStringAsFixed(2),
                 right: true),
-            cell(f?.decayMs == null ? '—' : '${(f!.decayMs! / 1000).toStringAsFixed(1)}s',
+            cell(
+                f?.freq == null
+                    ? '—'
+                    : '${(f!.highRatio * 100).toStringAsFixed(1)}%',
+                right: true),
+            cell(
+                f?.decayMs == null
+                    ? '—'
+                    : '${(f!.decayMs! / 1000).toStringAsFixed(1)}s',
                 right: true),
           ],
         ),
@@ -437,9 +455,13 @@ class _VisualizePageState extends State<VisualizePage>
             children: [
               Icon(icon, size: 16, color: color),
               const SizedBox(width: 6),
-              Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+              Text(title,
+                  style: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w700)),
               const Spacer(),
-              Text(note, style: const TextStyle(fontSize: 10, color: AppColors.inkSoft)),
+              Text(note,
+                  style:
+                      const TextStyle(fontSize: 10, color: AppColors.inkSoft)),
             ],
           ),
           const SizedBox(height: 8),
@@ -457,9 +479,12 @@ class _VisualizePageState extends State<VisualizePage>
         child: Column(
           children: [
             Text(v,
-                style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700)),
+                style: const TextStyle(
+                    fontSize: 13.5, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
-            Text(k, style: const TextStyle(fontSize: 10.5, color: AppColors.inkSoft)),
+            Text(k,
+                style:
+                    const TextStyle(fontSize: 10.5, color: AppColors.inkSoft)),
           ],
         ),
       );
@@ -512,12 +537,15 @@ Color _heat(double v) {
   final x = v.clamp(0.0, 1.0).toDouble();
   if (x <= 0.02) return _panelBg;
   if (x < 0.5) {
-    return Color.lerp(const Color(0xFF17242E), const Color(0xFF2E7A69), x / 0.5)!;
+    return Color.lerp(
+        const Color(0xFF17242E), const Color(0xFF2E7A69), x / 0.5)!;
   }
   if (x < 0.88) {
-    return Color.lerp(const Color(0xFF2E7A69), const Color(0xFFEFD79B), (x - 0.5) / 0.38)!;
+    return Color.lerp(
+        const Color(0xFF2E7A69), const Color(0xFFEFD79B), (x - 0.5) / 0.38)!;
   }
-  return Color.lerp(const Color(0xFFEFD79B), const Color(0xFFC8553D), (x - 0.88) / 0.12)!;
+  return Color.lerp(
+      const Color(0xFFEFD79B), const Color(0xFFC8553D), (x - 0.88) / 0.12)!;
 }
 
 void _label(Canvas canvas, String s, Offset at, double size, Color color) {
@@ -550,7 +578,8 @@ void _dashed(Canvas canvas, Offset a, Offset b, Paint paint) {
 
 /// 声波频谱：最新一帧的 48 个对数频段能量。
 class _SpectrumPainter extends CustomPainter {
-  _SpectrumPainter({required this.analyzer, required this.t, required this.active});
+  _SpectrumPainter(
+      {required this.analyzer, required this.t, required this.active});
   final LiveAudioAnalyzer analyzer;
   final double t;
   final bool active;
@@ -576,13 +605,15 @@ class _SpectrumPainter extends CustomPainter {
       final v = row[b].clamp(0.0, 1.0).toDouble();
       final h = math.max(1.5, v * size.height * 0.94);
       final x = b * (bw + gap);
-      canvas.drawRect(Rect.fromLTWH(x, size.height - h, bw, h), Paint()..color = _heat(v));
+      canvas.drawRect(
+          Rect.fromLTWH(x, size.height - h, bw, h), Paint()..color = _heat(v));
     }
 
     // 频率刻度
     const ticks = [100.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0];
     final logLow = math.log(LiveAudioAnalyzer.bandLowHz);
-    final logSpan = math.log(LiveAudioAnalyzer.bandHighHz / LiveAudioAnalyzer.bandLowHz);
+    final logSpan =
+        math.log(LiveAudioAnalyzer.bandHighHz / LiveAudioAnalyzer.bandLowHz);
     final tickPaint = Paint()
       ..color = Colors.white.withValues(alpha: 0.14)
       ..strokeWidth = 1;
@@ -592,12 +623,14 @@ class _SpectrumPainter extends CustomPainter {
       final label = f >= 1000
           ? '${(f / 1000).toStringAsFixed(f % 1000 == 0 ? 0 : 1)}k'
           : f.toStringAsFixed(0);
-      _label(canvas, label, Offset(x + 2, 2), 8, Colors.white.withValues(alpha: 0.38));
+      _label(canvas, label, Offset(x + 2, 2), 8,
+          Colors.white.withValues(alpha: 0.38));
     }
   }
 
   @override
-  bool shouldRepaint(covariant _SpectrumPainter old) => old.t != t || old.active != active;
+  bool shouldRepaint(covariant _SpectrumPainter old) =>
+      old.t != t || old.active != active;
 }
 
 /// 声纹瀑布：近 2.2 秒的频谱回溯（上旧下新）。
@@ -608,7 +641,8 @@ class _WaterfallPainter extends CustomPainter {
 
   /// 量化热力色阶：瀑布每帧最多要画 150×48 格，逐格 Color.lerp 会制造
   /// 大量临时对象并拖垮帧率，这里预先算好 33 级色阶直接取用。
-  static final List<Color> _ramp = List<Color>.generate(33, (i) => _heat(i / 32));
+  static final List<Color> _ramp =
+      List<Color>.generate(33, (i) => _heat(i / 32));
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -628,7 +662,8 @@ class _WaterfallPainter extends CustomPainter {
         canvas.drawRect(Rect.fromLTWH(b * cw, y, cw + 0.7, rh + 0.7), paint);
       }
     }
-    _label(canvas, '旧', Offset(size.width - 16, 2), 8, Colors.white.withValues(alpha: 0.32));
+    _label(canvas, '旧', Offset(size.width - 16, 2), 8,
+        Colors.white.withValues(alpha: 0.32));
     _label(canvas, '新', Offset(size.width - 16, size.height - 12), 8,
         Colors.white.withValues(alpha: 0.55));
   }
@@ -669,7 +704,8 @@ class _PitchPainter extends CustomPainter {
     for (var m = 36; m <= 84; m += 12) {
       final y = yOf(m.toDouble());
       canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
-      _label(canvas, noteName(m), Offset(2, y - 10), 8, Colors.white.withValues(alpha: 0.3));
+      _label(canvas, noteName(m), Offset(2, y - 10), 8,
+          Colors.white.withValues(alpha: 0.3));
     }
 
     const n = LiveAudioAnalyzer.pitchHistoryLength;
@@ -709,7 +745,8 @@ class _PitchPainter extends CustomPainter {
     final cur = currentMidi;
     if (cur != null) {
       final y = yOf(cur);
-      canvas.drawCircle(Offset(size.width - 4, y), 4, Paint()..color = AppColors.cinnabar);
+      canvas.drawCircle(
+          Offset(size.width - 4, y), 4, Paint()..color = AppColors.cinnabar);
       _label(canvas, label, Offset(size.width - 92, y - 18), 9.5,
           Colors.white.withValues(alpha: 0.88));
     }
@@ -721,7 +758,8 @@ class _PitchPainter extends CustomPainter {
 
 /// 谐波包络：实时 16 次谐波柱状 + 最接近音色的参考包络虚线。
 class _EnvelopePainter extends CustomPainter {
-  _EnvelopePainter({required this.live, required this.reference, required this.t});
+  _EnvelopePainter(
+      {required this.live, required this.reference, required this.t});
   final Float32List? live;
   final List<double>? reference;
   final double t;
@@ -748,7 +786,9 @@ class _EnvelopePainter extends CustomPainter {
       final h = math.max(1.5, v * size.height * 0.9);
       canvas.drawRect(
         Rect.fromLTWH(x, size.height - h, bw, h),
-        Paint()..color = Color.lerp(AppColors.jade, const Color(0xFFF0D89A), k / (n - 1))!,
+        Paint()
+          ..color =
+              Color.lerp(AppColors.jade, const Color(0xFFF0D89A), k / (n - 1))!,
       );
     }
 
@@ -765,12 +805,13 @@ class _EnvelopePainter extends CustomPainter {
         final p = Offset(x, y);
         if (prev != null) _dashed(canvas, prev, p, line);
         prev = p;
-        canvas.drawCircle(p, 1.6, Paint()..color = Colors.white.withValues(alpha: 0.85));
+        canvas.drawCircle(
+            p, 1.6, Paint()..color = Colors.white.withValues(alpha: 0.85));
       }
     }
 
-    _label(canvas, live == null ? '等待音高…' : '基频 → 第 16 次谐波', const Offset(2, 2), 8.5,
-        Colors.white.withValues(alpha: 0.45));
+    _label(canvas, live == null ? '等待音高…' : '基频 → 第 16 次谐波', const Offset(2, 2),
+        8.5, Colors.white.withValues(alpha: 0.45));
   }
 
   @override

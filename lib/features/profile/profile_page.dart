@@ -12,6 +12,9 @@ import '../pieces/piece_detail_page.dart';
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
+  /// 切到「我的」标签时由根容器调用，刷新收藏与进度。
+  static void reload() => _ProfilePageState._reloader?.call();
+
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
@@ -19,6 +22,9 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   Map<String, int> _progress = {};
   List<GuqinPiece> _favorites = [];
+
+  /// 供外部（切到「我的」标签时）触发刷新。
+  static void Function()? _reloader;
 
   /// 进度维度定义：键 → 展示名
   static const _dimensions = <String, String>{
@@ -34,7 +40,14 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    _reloader = _load;
     _load();
+  }
+
+  @override
+  void dispose() {
+    _reloader = null;
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -59,6 +72,25 @@ class _ProfilePageState extends State<ProfilePage> {
     final maxDim = _dimensions.keys
         .map((k) => _progress[k] ?? 0)
         .fold<int>(1, (a, b) => b > a ? b : a);
+
+    // 琴人手账：9 枚印章，朱砂 / 泥金 / 石青 / 松烟四色轮替
+    final badges = <(String, String, Color, bool)>[
+      ('琴', '初临琴境', AppColors.cinnabar, (_progress['realm_views'] ?? 0) >= 1),
+      ('拨', '拨弦成声', AppColors.gold, (_progress['model_views'] ?? 0) >= 1),
+      ('谱', '识谱初探', AppColors.jade, (_progress['notation_views'] ?? 0) >= 1),
+      ('曲', '琴曲开卷', AppColors.ink, (_progress['piece_views'] ?? 0) >= 1),
+      (
+        '指',
+        '指法初成',
+        AppColors.cinnabar,
+        (_progress['fingering_views'] ?? 0) >= 1
+      ),
+      ('引', '琴引成', AppColors.gold, (_progress['realm_guide_done'] ?? 0) >= 1),
+      ('境', '数字琴境', AppColors.jade, (_progress['realm_views'] ?? 0) >= 3),
+      ('藏', '琴曲收藏', AppColors.ink, _favorites.isNotEmpty),
+      ('友', '七弦老友', AppColors.cinnabar, totalViews >= 10),
+    ];
+    final unlockedCount = badges.where((b) => b.$4).length;
 
     // 减字识认：以前缀 sym_ 记下的已识减字。
     final symTotal = SeedData.symbols.length;
@@ -96,6 +128,60 @@ class _ProfilePageState extends State<ProfilePage> {
                               fontSize: 12, color: AppColors.inkSoft)),
                     ],
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 22),
+            SectionTitle(
+                title: '琴人手账',
+                subtitle: '$unlockedCount / ${badges.length} 枚印章'),
+            PaperCard(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+              child: GridView.count(
+                crossAxisCount: 3,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.95,
+                children: [
+                  for (final b in badges)
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 46,
+                          height: 46,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: b.$4 ? b.$3 : Colors.transparent,
+                            border: Border.all(
+                                color: b.$4 ? b.$3 : AppColors.line,
+                                width: 1.4),
+                            borderRadius: BorderRadius.circular(4),
+                            boxShadow: b.$4
+                                ? [
+                                    BoxShadow(
+                                        color: b.$3.withValues(alpha: 0.3),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2))
+                                  ]
+                                : null,
+                          ),
+                          child: Text(b.$1,
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color:
+                                      b.$4 ? Colors.white : AppColors.inkSoft)),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(b.$2,
+                            style: TextStyle(
+                                fontSize: 11,
+                                color:
+                                    b.$4 ? AppColors.ink : AppColors.inkSoft)),
+                      ],
+                    ),
                 ],
               ),
             ),

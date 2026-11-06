@@ -152,7 +152,7 @@ class PracticeListener {
   void _step(double timeMs, double rms, double? freq, double conf) {
     onProgress?.call(rms, conf >= 0.55 ? freq : null);
 
-    final loudThreshold = math.max(_floor * 3.5, 0.0055);
+    final loudThreshold = math.max(_floor * 3.5, 0.004);
     final loud = rms > loudThreshold;
     if (!loud) _floor = _floor * 0.94 + rms * 0.06;
 

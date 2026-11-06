@@ -89,7 +89,8 @@ class _PieceListPageState extends State<PieceListPage> {
                   showCheckmark: false,
                   onSelected: (_) => setState(() => _difficulty = d),
                   labelStyle: TextStyle(
-                      fontSize: 12, color: selected ? Colors.white : AppColors.inkSoft),
+                      fontSize: 12,
+                      color: selected ? Colors.white : AppColors.inkSoft),
                   selectedColor: AppColors.cinnabar,
                   backgroundColor: AppColors.paperLight,
                   side: const BorderSide(color: AppColors.line),
@@ -104,12 +105,14 @@ class _PieceListPageState extends State<PieceListPage> {
                   .queryPieces(keyword: _keyword, difficulty: _difficulty),
               builder: (context, snap) {
                 if (!snap.hasData) {
-                  return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                  return const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2));
                 }
                 final list = snap.data!;
                 if (list.isEmpty) {
                   return const Center(
-                    child: Text('未找到相关曲目', style: TextStyle(color: AppColors.inkSoft)),
+                    child: Text('未找到相关曲目',
+                        style: TextStyle(color: AppColors.inkSoft)),
                   );
                 }
                 return ListView.separated(
@@ -123,7 +126,8 @@ class _PieceListPageState extends State<PieceListPage> {
                       padding: const EdgeInsets.all(14),
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => PieceDetailPage(pieceId: p.id!)),
+                        MaterialPageRoute(
+                            builder: (_) => PieceDetailPage(pieceId: p.id!)),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,57 +143,70 @@ class _PieceListPageState extends State<PieceListPage> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(p.title,
-                                    maxLines: 1,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(p.title,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w700,
+                                              letterSpacing: 2)),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    TagChip(p.difficulty),
+                                    const SizedBox(width: 6),
+                                    GestureDetector(
+                                      onTap: () => _toggleFav(p.id!),
+                                      child: Icon(
+                                        fav
+                                            ? Icons.bookmark
+                                            : Icons.bookmark_border,
+                                        size: 20,
+                                        color: fav
+                                            ? AppColors.cinnabar
+                                            : AppColors.inkSoft,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(p.intro,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 2)),
-                              ),
-                              const SizedBox(width: 8),
-                              TagChip(p.difficulty),
-                              const SizedBox(width: 6),
-                              GestureDetector(
-                                onTap: () => _toggleFav(p.id!),
-                                child: Icon(
-                                  fav ? Icons.bookmark : Icons.bookmark_border,
-                                  size: 20,
-                                  color: fav ? AppColors.cinnabar : AppColors.inkSoft,
+                                        fontSize: 12,
+                                        height: 1.7,
+                                        color: AppColors.inkSoft)),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text('${p.dynasty} · ${p.author}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              fontSize: 11,
+                                              color: AppColors.inkSoft)),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    ...p.tags.take(2).map((t) => Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 6),
+                                          child:
+                                              TagChip(t, color: AppColors.gold),
+                                        )),
+                                  ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(p.intro,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontSize: 12, height: 1.7, color: AppColors.inkSoft)),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Text('${p.dynasty} · ${p.author}',
-                                  style: const TextStyle(
-                                      fontSize: 11, color: AppColors.inkSoft)),
-                              const Spacer(),
-                              ...p.tags.take(2).map((t) => Padding(
-                                    padding: const EdgeInsets.only(left: 6),
-                                    child: TagChip(t, color: AppColors.gold),
-                                  )),
-                            ],
-                          ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+                        ],
+                      ),
+                    );
                   },
                 );
               },

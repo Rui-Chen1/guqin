@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../features/assist/assist_page.dart';
 import '../features/culture/culture_list_page.dart';
 import '../features/fingering/fingering_page.dart';
+import '../features/experience/mood_sound_page.dart';
 import '../features/model3d/model_page.dart';
 import '../features/notation/notation_page.dart';
 import '../features/pieces/piece_list_page.dart';
@@ -59,7 +60,7 @@ const List<AppFeature> kLearningFeatures = [
   ),
 ];
 
-/// 数字体验类：三维 + 辅助 + 可视化 + 琴境
+/// 数字体验类：三维 + 辅助 + 可视化 + 琴境（含意境生音）
 const List<AppFeature> kExperienceFeatures = [
   AppFeature(
     title: '古琴三维展示',
@@ -84,14 +85,17 @@ const List<AppFeature> kExperienceFeatures = [
   ),
   AppFeature(
     title: '数字琴境体验',
-    subtitle: '轻量化虚拟场景，沉浸式体验',
+    subtitle: '沉浸场景 · 双手抚弦 · 意境生音',
     icon: Icons.nights_stay_outlined,
     color: Color(0xFF5A6E8C),
     builder: _buildRealm,
   ),
 ];
 
-const List<AppFeature> kAllFeatures = [...kLearningFeatures, ...kExperienceFeatures];
+const List<AppFeature> kAllFeatures = [
+  ...kLearningFeatures,
+  ...kExperienceFeatures
+];
 
 Widget _buildCulture(BuildContext c) => const CultureListPage();
 Widget _buildPieces(BuildContext c) => const PieceListPage();
@@ -101,3 +105,4 @@ Widget _buildModel(BuildContext c) => const ModelPage();
 Widget _buildAssist(BuildContext c) => const AssistPage();
 Widget _buildVisualize(BuildContext c) => const VisualizePage();
 Widget _buildRealm(BuildContext c) => const RealmPage();
+Widget _buildMoodSound(BuildContext c) => const MoodSoundPage();

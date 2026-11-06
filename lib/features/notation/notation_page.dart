@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 
 import '../../common/guqin_sound.dart';
 import '../../common/ink_scaffold.dart';
@@ -469,6 +471,13 @@ class _ComposeTabState extends State<_ComposeTab> {
   bool _completed = false;
   String? _feedback;
 
+  // 60 秒竞速
+  bool _rush = false;
+  int _score = 0;
+  int _combo = 0;
+  int _secondsLeft = 0;
+  Timer? _timer;
+
   NotationSymbol get _target => _levels[_levelIndex];
   List<String> get _answers => [
         _target.leftHand,
@@ -481,6 +490,50 @@ class _ComposeTabState extends State<_ComposeTab> {
   void initState() {
     super.initState();
     _pieces = _createPieces();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startRush() {
+    _timer?.cancel();
+    _score = 0;
+    _combo = 0;
+    _secondsLeft = 60;
+    _levelIndex = 0;
+    _rush = true;
+    _placed.clear();
+    _pieces = _createPieces();
+    _levelComplete = false;
+    _completed = false;
+    _feedback = '竞速开始！拼得越快分越高';
+    setState(() {});
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      setState(() => _secondsLeft--);
+      if (_secondsLeft <= 0) {
+        t.cancel();
+        setState(() {
+          _rush = false;
+          _feedback = '时间到！本局得分 $_score';
+        });
+        showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('竞速结束'),
+            content: Text('60 秒共得 $_score 分，最高连击 $_combo 次。'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('再来一局'),
+              ),
+            ],
+          ),
+        );
+      }
+    });
   }
 
   List<_PuzzlePiece> _createPieces() {
@@ -518,21 +571,41 @@ class _ComposeTabState extends State<_ComposeTab> {
   void _acceptPiece(int quadrant, _PuzzlePiece piece) {
     if (_levelComplete || _completed || _placed.containsKey(quadrant)) return;
     if (piece.value != _answers[quadrant]) {
+      if (_rush) {
+        _combo = 0;
+        HapticFeedback.mediumImpact();
+      }
       setState(() => _feedback = '这个部件不属于该宫格，再试一次。');
       return;
     }
 
+    if (_rush) {
+      _combo++;
+      _score += 10 * _combo;
+    }
     setState(() {
       _placed[quadrant] = piece;
-      _feedback = '正确，继续拼合。';
+      _feedback = _rush ? '+${10 * _combo}（连击 $_combo）' : '正确，继续拼合。';
     });
 
     if (_placed.length != 4) return;
     setState(() {
       _levelComplete = true;
-      _completed = _levelIndex == _levels.length - 1;
+      _completed = !_rush && _levelIndex == _levels.length - 1;
       _feedback = _completed ? '四关全部完成，减字拼合成功！' : '拼合成功，看看完整减字。';
     });
+    if (_rush) {
+      // 竞速模式下 0.6 秒后自动进入下一题
+      Timer(const Duration(milliseconds: 600), () {
+        if (!mounted || !_rush) return;
+        setState(() {
+          _levelIndex = (_levelIndex + 1) % _levels.length;
+          _placed.clear();
+          _pieces = _createPieces();
+          _levelComplete = false;
+        });
+      });
+    }
   }
 
   void _nextLevel() {
@@ -587,8 +660,43 @@ class _ComposeTabState extends State<_ComposeTab> {
               onPressed: _resetLevel,
               child: const Text('重置'),
             ),
+            if (!_rush)
+              FilledButton.icon(
+                onPressed: _startRush,
+                icon: const Icon(Icons.timer, size: 16),
+                label: const Text('60 秒竞速'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.cinnabar,
+                  foregroundColor: Colors.white,
+                ),
+              ),
           ],
         ),
+        if (_rush) ...[
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('⏱ $_secondsLeft s',
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.cinnabar)),
+              const SizedBox(width: 20),
+              Text('得分 $_score',
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.ink)),
+              const SizedBox(width: 20),
+              Text('连击 ×$_combo',
+                  style: const TextStyle(
+                      fontSize: 16,
+                      color: AppColors.gold,
+                      fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ],
         const SizedBox(height: 4),
         PaperCard(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

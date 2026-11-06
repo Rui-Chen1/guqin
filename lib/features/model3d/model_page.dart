@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '../../common/guqin_sound.dart';
 import '../../common/ink_scaffold.dart';
 import '../../common/widgets.dart';
 import '../../data/app_database.dart';
@@ -31,6 +34,12 @@ class _ModelPageState extends State<ModelPage> with TickerProviderStateMixin {
       AnimationController(vsync: this, duration: const Duration(seconds: 12))
         ..repeat();
   late final TabController _details = TabController(length: 4, vsync: this);
+
+  /// 七弦拨弦余振进度（1=静止），0 起随时间衰减。
+  final List<double> _pluckAge = List.filled(7, 1.0);
+  late final AnimationController _vibe =
+      AnimationController(vsync: this, duration: const Duration(seconds: 2))
+        ..repeat();
 
   static const _styles = ['仲尼', '连珠', '落霞'];
   static const _detailTabs = ['形制', '名琴', '音色', '身世'];
@@ -71,6 +80,8 @@ class _ModelPageState extends State<ModelPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     AppDatabase.instance.bumpProgress('model_views');
+    unawaited(GuqinSound.instance.preload(GuqinSound.stringSet('open')));
+    unawaited(GuqinSound.instance.preload(GuqinSound.stringSet('harm')));
     _details.addListener(() {
       if (_details.index != _detailIndex) {
         setState(() => _detailIndex = _details.index);
@@ -82,6 +93,8 @@ class _ModelPageState extends State<ModelPage> with TickerProviderStateMixin {
   void dispose() {
     _details.dispose();
     _spin.dispose();
+    _vibe.dispose();
+    unawaited(GuqinSound.instance.stopAll());
     super.dispose();
   }
 
@@ -92,6 +105,51 @@ class _ModelPageState extends State<ModelPage> with TickerProviderStateMixin {
       _scale = 1.0;
       _autoRotate = true;
     });
+  }
+
+  /// 点弦即拨；点在徽位附近则出泛音。
+  void _onTapQin(Offset local, Size viewSize) {
+    final yaw = _autoRotate ? _yaw + _spin.value * 2 * math.pi : _yaw;
+    Offset sp(V3 p) => Guqin3DPainter.projectPoint(
+          viewSize,
+          yaw: yaw,
+          pitch: _pitch,
+          scale: _scale,
+          perspective: _perspective,
+          p: p,
+        );
+    final mid = Guqin3DPainter.halfWidth(
+            Guqin3DPainter._zStart + Guqin3DPainter._len * 0.5, _styleIndex) *
+        0.74;
+    var best = -1, bestD = 34.0;
+    for (var i = 0; i < 7; i++) {
+      final x = -mid + 2 * mid * i / 6;
+      final c = sp(V3(x, Guqin3DPainter._halfThick + 0.03,
+          Guqin3DPainter._zStart + Guqin3DPainter._len * 0.5));
+      final d = (c - local).distance;
+      if (d < bestD) {
+        bestD = d;
+        best = i;
+      }
+    }
+    if (best < 0) return;
+
+    var harmonic = false;
+    for (final f in Guqin3DPainter._huiFractions) {
+      final hp = sp(V3(0, Guqin3DPainter._halfThick + 0.006,
+          Guqin3DPainter._zStart + 0.03 + Guqin3DPainter._stringLen * f));
+      if ((hp - local).distance < 20) {
+        harmonic = true;
+        break;
+      }
+    }
+
+    setState(() => _pluckAge[best] = 0);
+    GuqinSound.instance.play(
+      GuqinSound.file(harmonic ? 'harm' : 'open', best),
+      volume: 0.9,
+    );
+    HapticFeedback.lightImpact();
   }
 
   @override
@@ -126,45 +184,61 @@ class _ModelPageState extends State<ModelPage> with TickerProviderStateMixin {
               children: [
                 SizedBox(
                   height: 340,
-                  child: GestureDetector(
-                    onScaleStart: (_) => _lastScale = _scale,
-                    onScaleUpdate: (d) {
-                      setState(() {
-                        _yaw += d.focalPointDelta.dx * 0.008;
-                        _pitch = (_pitch + d.focalPointDelta.dy * 0.006)
-                            .clamp(-1.2, 1.2)
-                            .toDouble();
-                        if (d.pointerCount > 1) {
-                          _scale =
-                              (_lastScale * d.scale).clamp(0.6, 2.4).toDouble();
-                        }
-                        _autoRotate = false;
-                      });
+                  child: LayoutBuilder(
+                    builder: (context, bc) {
+                      final viewSize = Size(bc.maxWidth, bc.maxHeight);
+                      return GestureDetector(
+                        onScaleStart: (_) => _lastScale = _scale,
+                        onTapDown: (d) => _onTapQin(d.localPosition, viewSize),
+                        onScaleUpdate: (d) {
+                          setState(() {
+                            _yaw += d.focalPointDelta.dx * 0.008;
+                            _pitch = (_pitch + d.focalPointDelta.dy * 0.006)
+                                .clamp(-1.2, 1.2)
+                                .toDouble();
+                            if (d.pointerCount > 1) {
+                              _scale = (_lastScale * d.scale)
+                                  .clamp(0.6, 2.4)
+                                  .toDouble();
+                            }
+                            _autoRotate = false;
+                          });
+                        },
+                        child: AnimatedBuilder(
+                          animation: Listenable.merge([_spin, _vibe]),
+                          builder: (context, _) {
+                            final yaw = _autoRotate
+                                ? _yaw + _spin.value * 2 * math.pi
+                                : _yaw;
+                            // 逐弦衰减余振
+                            for (var i = 0; i < 7; i++) {
+                              if (_pluckAge[i] < 1) {
+                                _pluckAge[i] =
+                                    math.min(1.0, _pluckAge[i] + 0.016 / 1.6);
+                              }
+                            }
+                            return CustomPaint(
+                              painter: Guqin3DPainter(
+                                yaw: yaw,
+                                pitch: _pitch,
+                                scale: _scale,
+                                perspective: _perspective,
+                                styleIndex: _styleIndex,
+                                pluckAges: List.of(_pluckAge),
+                                vibratePhase: _vibe.value,
+                              ),
+                              size: Size.infinite,
+                            );
+                          },
+                        ),
+                      );
                     },
-                    child: AnimatedBuilder(
-                      animation: _spin,
-                      builder: (context, _) {
-                        final yaw = _autoRotate
-                            ? _yaw + _spin.value * 2 * math.pi
-                            : _yaw;
-                        return CustomPaint(
-                          painter: Guqin3DPainter(
-                            yaw: yaw,
-                            pitch: _pitch,
-                            scale: _scale,
-                            perspective: _perspective,
-                            styleIndex: _styleIndex,
-                          ),
-                          size: Size.infinite,
-                        );
-                      },
-                    ),
                   ),
                 ),
                 const Padding(
                   padding: EdgeInsets.only(bottom: 10),
                   child: Text(
-                    '拖动旋转 · 双指缩放',
+                    '拖动旋转 · 双指缩放 · 点弦即拨 · 点徽为泛音',
                     style: TextStyle(fontSize: 11, color: AppColors.inkSoft),
                   ),
                 ),
@@ -302,6 +376,12 @@ class Guqin3DPainter extends CustomPainter {
   /// 高亮呼吸相位 0..1，用于脉冲光晕。
   final double pulse;
 
+  /// 七弦余振进度（1=静止）。
+  final List<double> pluckAges;
+
+  /// 振动相位 0..1。
+  final double vibratePhase;
+
   Guqin3DPainter({
     required this.yaw,
     required this.pitch,
@@ -312,6 +392,8 @@ class Guqin3DPainter extends CustomPainter {
     this.highlightHui = -1,
     this.highlightString = -1,
     this.pulse = 0,
+    this.pluckAges = const [],
+    this.vibratePhase = 0,
   });
 
   // 十三徽对应的弦长比例（自岳山起）
@@ -383,8 +465,8 @@ class Guqin3DPainter extends CustomPainter {
     for (var i = 0; i < steps; i++) {
       final z0 = _zStart + _len * i / steps;
       final z1 = _zStart + _len * (i + 1) / steps;
-      final w0 = _halfWidth(z0, style);
-      final w1 = _halfWidth(z1, style);
+      final w0 = halfWidth(z0, style);
+      final w1 = halfWidth(z1, style);
 
       void addQuad(List<V3> pts, Color color) => faces.add(_Face(pts, color));
 
@@ -488,34 +570,53 @@ class Guqin3DPainter extends CustomPainter {
       );
     }
 
-    // 七弦
+    // 七弦（可振动：拨过后随相位起伏）
     if (showStrings) {
-      final spread = _halfWidth(_zStart + _len * 0.5, style) * 0.74;
+      final spread = halfWidth(_zStart + _len * 0.5, style) * 0.74;
       for (var i = 0; i < 7; i++) {
         final x = -spread + 2 * spread * i / 6;
-        final a = project(V3(x, _halfThick + 0.03, _zStart + 0.03));
-        final b =
-            project(V3(x, _halfThick + 0.03, _zStart + 0.03 + _stringLen));
+        final age = i < pluckAges.length ? pluckAges[i] : 1.0;
+        final amp = age < 1 ? 0.025 * (1 - age) * math.exp(-2.0 * age) : 0.0;
         final on = highlightString == i;
+
+        // 沿弦长采样，拨过时中间微微起伏
+        final pts = <Offset>[];
+        const N = 28;
+        for (var s = 0; s <= N; s++) {
+          final tz = s / N;
+          final z = _zStart + 0.03 + tz * _stringLen;
+          final env = math.sin(tz * math.pi);
+          final dy =
+              amp * env * math.sin(tz * math.pi * 1.5 - vibratePhase * 22);
+          pts.add(project(V3(x, _halfThick + 0.03 + dy, z)));
+        }
         if (on) {
           final glow = 0.6 + 0.4 * pulse;
-          canvas.drawLine(
-            a,
-            b,
+          final glowPath = Path()..moveTo(pts.first.dx, pts.first.dy);
+          for (final p in pts.skip(1)) {
+            glowPath.lineTo(p.dx, p.dy);
+          }
+          canvas.drawPath(
+            glowPath,
             Paint()
               ..color = const Color(0xFFFFE9A8).withValues(alpha: 0.55 * glow)
               ..strokeWidth = 6.0
               ..strokeCap = StrokeCap.round
+              ..style = PaintingStyle.stroke
               ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
           );
         }
-        canvas.drawLine(
-          a,
-          b,
+        final path = Path()..moveTo(pts.first.dx, pts.first.dy);
+        for (final p in pts.skip(1)) {
+          path.lineTo(p.dx, p.dy);
+        }
+        canvas.drawPath(
+          path,
           Paint()
             ..color = on ? const Color(0xFFFFDFA0) : const Color(0xFFF6EEDC)
             ..strokeWidth = (1.0 + i * 0.16) * (on ? 1.9 : 1.0)
-            ..strokeCap = StrokeCap.round,
+            ..strokeCap = StrokeCap.round
+            ..style = PaintingStyle.stroke,
         );
       }
     }
@@ -542,7 +643,7 @@ class Guqin3DPainter extends CustomPainter {
   }
 
   /// 琴身半宽（含项、腰曲线）。
-  double _halfWidth(double z, int style) {
+  static double halfWidth(double z, int style) {
     final t = (z - _zStart) / _len; // 0..1
     var w = 0.28;
     // 项（琴头一侧收窄）
@@ -583,7 +684,31 @@ class Guqin3DPainter extends CustomPainter {
       old.styleIndex != styleIndex ||
       old.highlightHui != highlightHui ||
       old.highlightString != highlightString ||
-      old.pulse != pulse;
+      old.pulse != pulse ||
+      old.vibratePhase != vibratePhase ||
+      old.pluckAges.join() != pluckAges.join();
+
+  /// 与 [paint] 相同的投影，供命中测试用。
+  static Offset projectPoint(
+    Size size, {
+    required double yaw,
+    required double pitch,
+    required double scale,
+    required bool perspective,
+    required V3 p,
+  }) {
+    final cx = size.width / 2;
+    final cy = size.height / 2 + size.height * 0.06;
+    final base = math.min(size.width, size.height) * 0.30 * scale;
+    final cosY = math.cos(yaw), sinY = math.sin(yaw);
+    final cosP = math.cos(pitch), sinP = math.sin(pitch);
+    final x1 = p.x * cosY + p.z * sinY;
+    final z1 = -p.x * sinY + p.z * cosY;
+    final y2 = p.y * cosP - z1 * sinP;
+    final z2 = p.y * sinP + z1 * cosP;
+    final f = perspective ? 3.2 / (3.2 + z2 + 1.2) : 1.0;
+    return Offset(cx + x1 * base * f, cy - y2 * base * f);
+  }
 }
 
 class _Face {

@@ -6,6 +6,7 @@ import '../../data/app_database.dart';
 import '../../data/models.dart';
 import '../../theme/app_theme.dart';
 import 'culture_detail_page.dart';
+import 'daily_card.dart';
 
 /// 功能一：古琴文化资料库 —— 分类浏览与检索。
 class CultureListPage extends StatefulWidget {
@@ -37,8 +38,10 @@ class _CultureListPageState extends State<CultureListPage> {
       appBar: AppBar(title: const Text('古琴文化资料库')),
       body: Column(
         children: [
+          const DailySignCard(),
+          const ColdFactCapsule(),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: TextField(
               onChanged: (v) => setState(() => _keyword = v),
               decoration: InputDecoration(
@@ -92,12 +95,14 @@ class _CultureListPageState extends State<CultureListPage> {
                   .queryArticles(category: _category, keyword: _keyword),
               builder: (context, snap) {
                 if (!snap.hasData) {
-                  return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                  return const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2));
                 }
                 final list = snap.data!;
                 if (list.isEmpty) {
                   return const Center(
-                    child: Text('未找到相关资料', style: TextStyle(color: AppColors.inkSoft)),
+                    child: Text('未找到相关资料',
+                        style: TextStyle(color: AppColors.inkSoft)),
                   );
                 }
                 return ListView.separated(
@@ -132,7 +137,10 @@ class _ArticleCard extends StatelessWidget {
         children: [
           SizedBox(
             width: 92,
-            child: GuqinImage(asset: article.imageAsset, height: 92, icon: Icons.auto_stories_outlined),
+            child: GuqinImage(
+                asset: article.imageAsset,
+                height: 92,
+                icon: Icons.auto_stories_outlined),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -148,12 +156,14 @@ class _ArticleCard extends StatelessWidget {
                 Text(article.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700)),
+                    style: const TextStyle(
+                        fontSize: 14.5, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 6),
                 Text(article.summary,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 11.5, height: 1.6, color: AppColors.inkSoft)),
+                    style: const TextStyle(
+                        fontSize: 11.5, height: 1.6, color: AppColors.inkSoft)),
               ],
             ),
           ),

@@ -57,14 +57,14 @@ class AppTheme {
     );
 
     return base.copyWith(
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.paper,
+      appBarTheme: AppBarTheme(
+        backgroundColor: AppColors.paper.withValues(alpha: 0.82),
         foregroundColor: AppColors.ink,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        shape: Border(bottom: BorderSide(color: AppColors.line)),
-        titleTextStyle: TextStyle(
+        shape: const Border(bottom: BorderSide(color: AppColors.line)),
+        titleTextStyle: const TextStyle(
           color: AppColors.ink,
           fontFamily: serifFamily,
           fontFamilyFallback: serifFallback,
@@ -162,8 +162,9 @@ class AppTheme {
   }
 
   /// 统一的册页面板装饰：方角、细描边、轻投影（替代现代圆角卡片）。
+  /// 面板用半透明宣纸白，让后面的水墨底图隐约透出，全应用气质统一。
   static BoxDecoration get card => BoxDecoration(
-        color: AppColors.paperLight,
+        color: AppColors.paperLight.withValues(alpha: 0.86),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: AppColors.line),
         boxShadow: const [

@@ -1233,6 +1233,19 @@ class _FingeringPainter extends CustomPainter {
       );
     }
 
+    // 手投在琴面上的软影，让手「落在」弦上而不是浮着
+    if (!ghost) {
+      canvas.drawOval(
+        Rect.fromCenter(
+            center: pose.contact + Offset(8 * _k, 14 * _k),
+            width: 90 * _k,
+            height: 26 * _k),
+        Paint()
+          ..color = Colors.black.withValues(alpha: 0.18 * alpha)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
+      );
+    }
+
     canvas.save();
     canvas.translate(origin.dx, origin.dy);
     canvas.rotate(pose.tilt);
@@ -1953,6 +1966,20 @@ class _FingeringPainter extends CustomPainter {
     for (var i = 0; i + 1 < pts.length; i++) {
       body.strokeWidth = g.width * (1 - 0.13 * i);
       canvas.drawLine(pts[i], pts[i + 1], body);
+    }
+    // 指身高光：受光面一条细亮线，模拟皮肤质感，从「平涂」变「立体」
+    final highlight = Paint()
+      ..color = const Color(0xFFFFF4E0).withValues(alpha: 0.35 * alpha)
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
+    for (var i = 0; i + 1 < pts.length; i++) {
+      highlight.strokeWidth = g.width * (1 - 0.13 * i) * 0.32;
+      final off = (pts[i + 1] - pts[i]).direction + math.pi / 2;
+      final shift = g.width * 0.18;
+      final a = pts[i] + Offset(math.cos(off), math.sin(off)) * shift;
+      final b = pts[i + 1] + Offset(math.cos(off), math.sin(off)) * shift;
+      canvas.drawLine(a, b, highlight);
     }
 
     // 指甲（覆于指端背面）：用甲多则显，用肉多则隐而现指肉之厚

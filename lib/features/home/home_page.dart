@@ -91,10 +91,10 @@ class _HomePageState extends State<HomePage> {
               ),
               child: ListView(
                 controller: _scroll,
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 30),
+                padding: const EdgeInsets.fromLTRB(8, 4, 8, 30),
                 children: [
                   const _BrandHeader(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   AnimatedSize(
                     duration: const Duration(milliseconds: 220),
                     alignment: Alignment.topCenter,
@@ -289,7 +289,7 @@ class _ScrollHero extends StatelessWidget {
                 color: AppColors.paper,
                 child: Image.asset(
                   slide.$1,
-                  fit: BoxFit.contain,
+                  fit: BoxFit.cover,
                   alignment: Alignment.center,
                   errorBuilder: (_, __, ___) => const _PaperFallback(),
                 ),

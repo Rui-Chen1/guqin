@@ -136,7 +136,8 @@ class _AssistPageState extends State<AssistPage> {
       setState(() => _countIn = b);
       HapticFeedback.selectionClick();
       if (_guide) {
-        unawaited(GuqinSound.instance.play('click.m4a', volume: b == _countInBeats ? 0.85 : 0.5));
+        unawaited(GuqinSound.instance
+            .play('click.m4a', volume: b == _countInBeats ? 0.85 : 0.5));
       }
       await Future<void>.delayed(Duration(milliseconds: beat.round()));
     }
@@ -322,11 +323,13 @@ class _AssistPageState extends State<AssistPage> {
               decoration: BoxDecoration(
                 color: on ? AppColors.cinnabar : AppColors.paperLight,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: on ? AppColors.cinnabar : AppColors.line),
+                border:
+                    Border.all(color: on ? AppColors.cinnabar : AppColors.line),
               ),
               child: Text(
                 PracticeData.phrases[i].title,
-                style: TextStyle(fontSize: 12, color: on ? Colors.white : AppColors.inkSoft),
+                style: TextStyle(
+                    fontSize: 12, color: on ? Colors.white : AppColors.inkSoft),
               ),
             ),
           );
@@ -343,17 +346,22 @@ class _AssistPageState extends State<AssistPage> {
           Row(
             children: [
               Text(phrase.title,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: 1)),
+                  style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1)),
               const SizedBox(width: 8),
               TagChip(phrase.level),
               const Spacer(),
               Text('${phrase.notes.length} 音',
-                  style: const TextStyle(fontSize: 11.5, color: AppColors.inkSoft)),
+                  style: const TextStyle(
+                      fontSize: 11.5, color: AppColors.inkSoft)),
             ],
           ),
           const SizedBox(height: 6),
           Text(phrase.hint,
-              style: const TextStyle(fontSize: 12, color: AppColors.inkSoft, height: 1.6)),
+              style: const TextStyle(
+                  fontSize: 12, color: AppColors.inkSoft, height: 1.6)),
           const SizedBox(height: 4),
           Text(
               phrase.rubato
@@ -408,11 +416,15 @@ class _AssistPageState extends State<AssistPage> {
                           ? (phrase.rubato
                               ? '正在采集弹奏，此为散板，请依曲中呼吸自由弹奏'
                               : '正在采集弹奏，请跟着拍点逐音弹奏')
-                          : (_result != null ? '本轮结束，可查看下方评测' : '点「开始练习」，倒数四拍后开始采集')),
-                  style: const TextStyle(fontSize: 11.5, color: AppColors.inkSoft),
+                          : (_result != null
+                              ? '本轮结束，可查看下方评测'
+                              : '点「开始练习」，倒数四拍后开始采集')),
+                  style:
+                      const TextStyle(fontSize: 11.5, color: AppColors.inkSoft),
                 ),
               ),
-              if (_result != null) TagChip('${_result!.score} 分', color: AppColors.cinnabar),
+              if (_result != null)
+                TagChip('${_result!.score} 分', color: AppColors.cinnabar),
             ],
           ),
         ],
@@ -431,11 +443,16 @@ class _AssistPageState extends State<AssistPage> {
                 child: FilledButton.icon(
                   onPressed: _busy || _listening ? _stop : _start,
                   style: FilledButton.styleFrom(
-                    backgroundColor: (_busy || _listening) ? AppColors.inkSoft : AppColors.cinnabar,
+                    backgroundColor: (_busy || _listening)
+                        ? AppColors.inkSoft
+                        : AppColors.cinnabar,
                     padding: const EdgeInsets.symmetric(vertical: 13),
                   ),
-                  icon: Icon((_busy || _listening) ? Icons.stop : Icons.mic, size: 18),
-                  label: Text(_busy || _listening ? '停止' : (_result != null ? '重新练习' : '开始练习')),
+                  icon: Icon((_busy || _listening) ? Icons.stop : Icons.mic,
+                      size: 18),
+                  label: Text(_busy || _listening
+                      ? '停止'
+                      : (_result != null ? '重新练习' : '开始练习')),
                 ),
               ),
               const SizedBox(width: 12),
@@ -456,7 +473,8 @@ class _AssistPageState extends State<AssistPage> {
           const SizedBox(height: 10),
           Row(
             children: [
-              const Text('速度', style: TextStyle(fontSize: 12, color: AppColors.inkSoft)),
+              const Text('速度',
+                  style: TextStyle(fontSize: 12, color: AppColors.inkSoft)),
               Expanded(
                 child: Slider(
                   value: _speed,
@@ -492,7 +510,8 @@ class _AssistPageState extends State<AssistPage> {
                     _phrase.rubato
                         ? '节奏引导（倒数拍声；散板不设拍点脉冲）'
                         : '节拍引导（倒数拍声 + 拍点视觉与轻触）',
-                    style: const TextStyle(fontSize: 12, color: AppColors.inkSoft)),
+                    style: const TextStyle(
+                        fontSize: 12, color: AppColors.inkSoft)),
               ),
               Switch(
                 value: _guide,
@@ -505,11 +524,15 @@ class _AssistPageState extends State<AssistPage> {
             const SizedBox(height: 6),
             Row(
               children: [
-                const Icon(Icons.error_outline, size: 15, color: AppColors.cinnabar),
+                const Icon(Icons.error_outline,
+                    size: 15, color: AppColors.cinnabar),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(_error!,
-                      style: const TextStyle(fontSize: 11.5, color: AppColors.cinnabar, height: 1.5)),
+                      style: const TextStyle(
+                          fontSize: 11.5,
+                          color: AppColors.cinnabar,
+                          height: 1.5)),
                 ),
               ],
             ),
@@ -527,7 +550,10 @@ class _AssistPageState extends State<AssistPage> {
           Row(
             children: [
               const Text('实时识别',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1)),
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1)),
               const Spacer(),
               ValueListenableBuilder<double>(
                 valueListenable: _levelN,
@@ -555,9 +581,15 @@ class _AssistPageState extends State<AssistPage> {
                 child: ValueListenableBuilder<double?>(
                   valueListenable: _freqN,
                   builder: (context, freq, _) => Text(
-                    freq == null ? '—' : noteName((69 + 12 * (math.log(freq / 440) / math.ln2)).round()),
+                    freq == null
+                        ? '—'
+                        : noteName((69 + 12 * (math.log(freq / 440) / math.ln2))
+                            .round()),
                     style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.ink, height: 1),
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.ink,
+                        height: 1),
                   ),
                 ),
               ),
@@ -596,11 +628,13 @@ class _AssistPageState extends State<AssistPage> {
         child: Column(
           children: [
             Text(value,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: color)),
+                style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.w700, color: color)),
             const SizedBox(height: 2),
             Text(label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 10.5, color: AppColors.inkSoft)),
+                style:
+                    const TextStyle(fontSize: 10.5, color: AppColors.inkSoft)),
           ],
         ),
       );
@@ -614,10 +648,14 @@ class _AssistPageState extends State<AssistPage> {
           Row(
             children: [
               const Text('本轮评测',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 1)),
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1)),
               const Spacer(),
               Text('命中 ${r.matchedCount}/${r.results.length}',
-                  style: const TextStyle(fontSize: 11.5, color: AppColors.inkSoft)),
+                  style: const TextStyle(
+                      fontSize: 11.5, color: AppColors.inkSoft)),
             ],
           ),
           const SizedBox(height: 10),
@@ -633,7 +671,8 @@ class _AssistPageState extends State<AssistPage> {
               const SizedBox(width: 4),
               const Padding(
                 padding: EdgeInsets.only(bottom: 4),
-                child: Text('分', style: TextStyle(fontSize: 13, color: AppColors.inkSoft)),
+                child: Text('分',
+                    style: TextStyle(fontSize: 13, color: AppColors.inkSoft)),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -644,14 +683,16 @@ class _AssistPageState extends State<AssistPage> {
                   '${r.extras > 0 ? ' · 多弹 ${r.extras} 音' : ''}\n'
                   '起奏${r.startOffsetMs >= 0 ? '偏晚' : '偏早'} ${r.startOffsetMs.abs().round()} 毫秒'
                   '${r.trendMsPerSec.abs() > 25 ? '，整体${r.trendMsPerSec > 0 ? '越弹越慢' : '越弹越快'}' : ''}',
-                  style: const TextStyle(fontSize: 12, height: 1.8, color: AppColors.inkSoft),
+                  style: const TextStyle(
+                      fontSize: 12, height: 1.8, color: AppColors.inkSoft),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
           Text(r.summary,
-              style: const TextStyle(fontSize: 12, height: 1.7, color: AppColors.ink)),
+              style: const TextStyle(
+                  fontSize: 12, height: 1.7, color: AppColors.ink)),
           if (problems.isNotEmpty) ...[
             const SizedBox(height: 12),
             const Divider(),
@@ -659,10 +700,14 @@ class _AssistPageState extends State<AssistPage> {
             Row(
               children: [
                 const Text('逐音纠正',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1)),
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1)),
                 const Spacer(),
                 Text('共 ${problems.length} 处',
-                    style: const TextStyle(fontSize: 11, color: AppColors.inkSoft)),
+                    style: const TextStyle(
+                        fontSize: 11, color: AppColors.inkSoft)),
               ],
             ),
             const SizedBox(height: 8),
@@ -670,7 +715,8 @@ class _AssistPageState extends State<AssistPage> {
             for (final p in _worst(problems, 20)) _problemRow(p),
             if (problems.length > 20)
               Text('另有 ${problems.length - 20} 处偏差未列出，建议放慢速度重练相关段落。',
-                  style: const TextStyle(fontSize: 11, color: AppColors.inkSoft, height: 1.6)),
+                  style: const TextStyle(
+                      fontSize: 11, color: AppColors.inkSoft, height: 1.6)),
           ],
         ],
       ),
@@ -718,7 +764,8 @@ class _AssistPageState extends State<AssistPage> {
               border: Border.all(color: color.withValues(alpha: 0.35)),
             ),
             child: Text('${p.index + 1}',
-                style: TextStyle(fontSize: 11.5, color: color, fontWeight: FontWeight.w700)),
+                style: TextStyle(
+                    fontSize: 11.5, color: color, fontWeight: FontWeight.w700)),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -729,13 +776,18 @@ class _AssistPageState extends State<AssistPage> {
                   children: [
                     TagChip(p.fault.label, color: color),
                     const SizedBox(width: 6),
-                    Text('标准 ${noteName(p.target.midi)} · ${positionLabel(p.target.midi)}',
-                        style: const TextStyle(fontSize: 11, color: AppColors.inkSoft)),
+                    Text(
+                        '标准 ${noteName(p.target.midi)} · ${positionLabel(p.target.midi)}',
+                        style: const TextStyle(
+                            fontSize: 11, color: AppColors.inkSoft)),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(p.advice,
-                    style: const TextStyle(fontSize: 11.5, height: 1.65, color: AppColors.inkSoft)),
+                    style: const TextStyle(
+                        fontSize: 11.5,
+                        height: 1.65,
+                        color: AppColors.inkSoft)),
               ],
             ),
           ),
@@ -783,12 +835,15 @@ class _CentsPainter extends CustomPainter {
       ..strokeWidth = 1;
     for (var i = -2; i <= 2; i++) {
       final x = size.width * (0.5 + i * 0.2);
-      canvas.drawLine(Offset(x, cy - (i == 0 ? 7 : 4)), Offset(x, cy + (i == 0 ? 7 : 4)), line);
+      canvas.drawLine(Offset(x, cy - (i == 0 ? 7 : 4)),
+          Offset(x, cy + (i == 0 ? 7 : 4)), line);
     }
     canvas.drawLine(Offset(0, cy), Offset(size.width, cy), line);
     for (var i = -1; i <= 1; i += 2) {
-      final x = size.width * 0.5 + size.width * 0.4 * (i == 0 ? 0 : i.toDouble());
-      canvas.drawLine(Offset(x, cy - 4), Offset(x, cy + 4), line..color = AppColors.line);
+      final x =
+          size.width * 0.5 + size.width * 0.4 * (i == 0 ? 0 : i.toDouble());
+      canvas.drawLine(
+          Offset(x, cy - 4), Offset(x, cy + 4), line..color = AppColors.line);
     }
 
     final x = size.width * (0.5 + (cents / 50) * 0.4);
@@ -800,7 +855,8 @@ class _CentsPainter extends CustomPainter {
         ..strokeWidth = 2.5
         ..strokeCap = StrokeCap.round,
     );
-    canvas.drawCircle(Offset(x, cy), 3.5, Paint()..color = color.withValues(alpha: active ? 1 : 0.3));
+    canvas.drawCircle(Offset(x, cy), 3.5,
+        Paint()..color = color.withValues(alpha: active ? 1 : 0.3));
   }
 
   @override
@@ -882,7 +938,8 @@ class _TrackPainter extends CustomPainter {
       final tp = TextPainter(
         text: TextSpan(
           text: kStringNames[i],
-          style: TextStyle(fontSize: 8.5, color: Colors.white.withValues(alpha: 0.28)),
+          style: TextStyle(
+              fontSize: 8.5, color: Colors.white.withValues(alpha: 0.28)),
         ),
         textDirection: TextDirection.ltr,
       )..layout();
@@ -894,9 +951,11 @@ class _TrackPainter extends CustomPainter {
       _paintBreath(canvas, size, hitX, pxPerMs, top, bottom);
     } else if (beatMs > 4) {
       final beatPaint = Paint()..color = Colors.white.withValues(alpha: 0.07);
-      final downbeatPaint = Paint()..color = const Color(0xFFE9C97A).withValues(alpha: 0.16);
+      final downbeatPaint = Paint()
+        ..color = const Color(0xFFE9C97A).withValues(alpha: 0.16);
       final firstBeat = ((nowMs - hitX / pxPerMs) / beatMs).floor();
-      final lastBeat = ((nowMs + (size.width - hitX) / pxPerMs) / beatMs).ceil();
+      final lastBeat =
+          ((nowMs + (size.width - hitX) / pxPerMs) / beatMs).ceil();
       for (var b = firstBeat; b <= lastBeat; b++) {
         if (b < 0) continue;
         final x = hitX + (b * beatMs - nowMs) * pxPerMs;
@@ -961,7 +1020,8 @@ class _TrackPainter extends CustomPainter {
       }
 
       const rad = 12.5;
-      canvas.drawCircle(Offset(x, y), rad, Paint()..color = color.withValues(alpha: 0.92));
+      canvas.drawCircle(
+          Offset(x, y), rad, Paint()..color = color.withValues(alpha: 0.92));
       if (r == null) {
         canvas.drawCircle(
           Offset(x, y),
@@ -1001,7 +1061,8 @@ class _TrackPainter extends CustomPainter {
             ..color = const Color(0xFF7FD6C0).withValues(alpha: 0.85)
             ..strokeWidth = 2,
         );
-        canvas.drawCircle(Offset(x, y), 2.5, Paint()..color = const Color(0xFF7FD6C0));
+        canvas.drawCircle(
+            Offset(x, y), 2.5, Paint()..color = const Color(0xFF7FD6C0));
       }
     }
 
@@ -1018,8 +1079,8 @@ class _TrackPainter extends CustomPainter {
   /// 不设小节线：横向流式布局不落在固定拍格上，而以一条随时间缓缓起伏的
   /// 气流线（约五秒一息）配合各音起音处的柔光提示，让音位的疏密由乐句
   /// 自身的伸缩决定，而非被等距网格切割。
-  void _paintBreath(
-      Canvas canvas, Size size, double hitX, double pxPerMs, double top, double bottom) {
+  void _paintBreath(Canvas canvas, Size size, double hitX, double pxPerMs,
+      double top, double bottom) {
     final phase = (nowMs / 5000.0) * 2 * math.pi;
     final breathe = 0.5 + 0.5 * math.sin(phase); // 0~1，呼吸强度
     final midY = (top + bottom) / 2;
@@ -1045,7 +1106,9 @@ class _TrackPainter extends CustomPainter {
     );
 
     // 起音微光：随呼吸明灭，代替等距拍点
-    final glow = Paint()..color = const Color(0xFFE9C97A).withValues(alpha: 0.05 + 0.07 * breathe);
+    final glow = Paint()
+      ..color =
+          const Color(0xFFE9C97A).withValues(alpha: 0.05 + 0.07 * breathe);
     for (final t in targets) {
       final x = hitX + (t.timeMs / speed - nowMs) * pxPerMs;
       if (x < -20 || x > size.width + 20) continue;
@@ -1073,7 +1136,8 @@ class _FooterNote extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('关于识别与隐私',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1)),
+              style: TextStyle(
+                  fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1)),
           SizedBox(height: 8),
           Text(
             '采集：麦克风以 44.1kHz 单声道 PCM 流式输入。\n'
@@ -1088,7 +1152,8 @@ class _FooterNote extends StatelessWidget {
             '入调曲目起音时值偏差 > 160ms、散板曲目 > 260ms 判为节奏偏差；'
             '整体时延会先做统一对齐，单独作为「起奏偏差」报告。\n'
             '隐私：音频全程仅在本机内存中分析，不上传、不落盘。',
-            style: TextStyle(fontSize: 12, height: 1.9, color: AppColors.inkSoft),
+            style:
+                TextStyle(fontSize: 12, height: 1.9, color: AppColors.inkSoft),
           ),
         ],
       ),

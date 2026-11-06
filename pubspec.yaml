@@ -19,6 +19,7 @@ dependencies:
   audioplayers: ^6.7.1
   # 智能演奏辅助：麦克风采集（PCM 流 → 本地音高/节奏分析）
   record: ^6.2.1
+  image_picker: ^1.2.4
 
 dev_dependencies:
   flutter_test:

@@ -27,6 +27,7 @@ class _RootScaffoldState extends State<RootScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.paper,
       body: IndexedStack(index: _index, children: _pages),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
@@ -38,7 +39,10 @@ class _RootScaffoldState extends State<RootScaffold> {
           elevation: 0,
           height: 62,
           selectedIndex: _index,
-          onDestinationSelected: (i) => setState(() => _index = i),
+          onDestinationSelected: (i) {
+            setState(() => _index = i);
+            if (i == 3) ProfilePage.reload();
+          },
           indicatorColor: AppColors.cinnabar.withValues(alpha: 0.12),
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: const [

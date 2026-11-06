@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>“弦上知音”需要使用麦克风以识别您的弹奏音高与节奏，提供演奏反馈。</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>“弦上知音”需要读取您选择的图片，以根据画面色调编排琴音。</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

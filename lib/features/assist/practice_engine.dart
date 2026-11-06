@@ -157,7 +157,8 @@ PracticeResult evaluate(
 
     final d = det[j];
     final timing = _timingDev(align, i, warp, phrase.rubato);
-    final cents = 1200 * math.log(d.freq / t.freq) / math.ln2;
+    final cents = _octaveSnap(
+        1200 * math.log(d.freq / t.freq) / math.ln2);
     final ac = cents.abs();
     final at = timing.abs();
 
@@ -234,8 +235,25 @@ class _Align {
   final List<int> pairOf;
 }
 
+/// 把音差折到最近的八度内（-600..600 音分）。
+///
+/// 古琴泛音强、YIN 偶会锁定在 2 次谐波上，差正好一个八度；
+/// 真实演奏者的音高偏移不会到这么大，因此打分与对齐时按八度折回，
+/// 只把「真的按错弦」判为错音。
+double _octaveSnap(double cents) {
+  var c = cents;
+  while (c > 600) {
+    c -= 1200;
+  }
+  while (c < -600) {
+    c += 1200;
+  }
+  return c;
+}
+
 double _matchCost(TargetNote t, DetectedNote d) {
-  final cents = 1200 * math.log(d.freq / t.freq) / math.ln2;
+  final cents =
+      _octaveSnap(1200 * math.log(d.freq / t.freq) / math.ln2);
   return math.min(cents.abs() / _centsPerUnit, _matchCapCost);
 }
 

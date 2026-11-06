@@ -9,7 +9,7 @@ import '../../theme/app_theme.dart';
 class ExperiencePage extends StatelessWidget {
   const ExperiencePage({super.key});
 
-  static const _numerals = ['伍', '陆', '柒', '捌'];
+  static const _numerals = ['伍', '陆', '柒', '捌', '玖'];
 
   @override
   Widget build(BuildContext context) {
